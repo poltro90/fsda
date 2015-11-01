@@ -1,0 +1,61 @@
+<section class="content-header">
+    <h1>
+        Dashboard
+        <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+    </ol>
+</section>
+
+    <!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h3 class="box-title">ECC</h3>
+                </div>
+                <div class="box-body">
+                    <canvas id="myChart"></canvas>
+                </div><!-- /.box-body -->
+                <!-- Loading (remove the following to stop the loading)-->
+                <div class="overlay">
+                    <i class="fa fa-refresh fa-spin"></i>
+                </div>
+                <!-- end loading -->
+            </div><!-- /.box -->
+        </div> 
+    </div>
+</section>
+<script type="text/javascript">
+    Chart.defaults.global.responsive = true;
+    var ctx = $("#myChart").get(0).getContext("2d");
+    var data = {
+    labels: [0,1,2,3,4,5,6,7,8,9,10],
+    datasets: [
+        {
+            label: "My First dataset",
+            fillColor: "rgba(220,220,220,0.2)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: [65, 59, 80, 81, 56, 55, 40]
+        },
+        {
+            label: "My Second dataset",
+            fillColor: "rgba(151,187,205,0.2)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(151,187,205,1)",
+            data: [28, 48, 40, 19, 86, 27, 90]
+        }
+    ]
+};
+    var myLineChart = new Chart(ctx).Line(data);
+</script>
