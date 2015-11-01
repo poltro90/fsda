@@ -171,7 +171,12 @@ function csvDecode($type, $results) {
         $response['rate'] = fgetcsv($cvs,0,",");
         $i=0;
         while ( ($data = fgetcsv($cvs,0,",")) !== false && ($i < $results) ) {
-            array_push($response['data'],$data);
+            $dataset[0] = $i;
+            $dataset[1] = $data;
+            if (count($data) == 1) {
+                $dataset[1] = $data[0];
+            }
+            array_push($response['data'],$dataset);
             $i++;
         }
         $response['results'] = $i;
