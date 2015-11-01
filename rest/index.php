@@ -65,35 +65,36 @@ $app->group('/api', function () use ($app) {
         $app->get(
             '/acc/:user/:results',
             function ($user, $results) {
-                $cvs = fopen('./data/ACC.csv','r');
-                for ($i=0; $i < ($results+2); $i++) {
-                    $data = fgetcsv($cvs,0,",");
-                    print_r($data);
-                }
+                $response = csvDecode('acc',$results);
+                echo json_encode($response,JSON_PRETTY_PRINT);
             }
         );
         $app->get(
             '/eda/:user/:results',
             function ($user, $results) {
-
+                $response = csvDecode('eda',$results);
+                echo json_encode($response,JSON_PRETTY_PRINT);
             }
         );
         $app->get(
             '/hr/:user/:results',
             function ($user, $results) {
-
+                $response = csvDecode('hr',$results);
+                echo json_encode($response,JSON_PRETTY_PRINT);
             }
         );
         $app->get(
             '/tags/:user/:results',
             function ($user, $results) {
-
+                $response = csvDecode('tags',$results);
+                echo json_encode($response,JSON_PRETTY_PRINT);
             }
         );
         $app->get(
             '/temp/:user/:results',
             function ($user, $results) {
-
+                $response = csvDecode('temp',$results);
+                echo json_encode($response,JSON_PRETTY_PRINT);
             }
         );
     });
@@ -148,3 +149,37 @@ $app->delete(
  * and returns the HTTP response to the HTTP client.
  */
 $app->run();
+
+/* 
+ * Get csv data from file and return an array
+ * Source of data is dummy cvs files
+ *
+ * @param $type string
+ * @param $results int
+ *
+ * @return array
+ */
+function csvDecode($type, $results) {
+    $response['type'] = $type;
+    $response['time'] = array();
+    $response['rate'] = array();
+    $response['data'] = array();
+    $response['error'] = false;
+    $file = './data/' . strtoupper($type) . '.csv';
+    if ( ($cvs = fopen($file,'r')) !== false ) {
+        $response['time'] = fgetcsv($cvs,0,",");
+        $response['rate'] = fgetcsv($cvs,0,",");
+        $i=0;
+        while ( ($data = fgetcsv($cvs,0,",")) !== false && ($i < $results) ) {
+            array_push($response['data'],$data);
+            $i++;
+        }
+        $response['results'] = $i;
+    }
+    else {
+        $response['error'] = true;
+        $response['data'] = array('Failed to read source of data.');
+    }
+    
+    return $response;
+}
