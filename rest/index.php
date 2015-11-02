@@ -4,7 +4,6 @@ require 'Slim/Slim.php';
 
 $app = new \Slim\Slim();
 
-
 // GET routes
 
 // Default route
@@ -12,6 +11,50 @@ $app->get(
     '/',
     function () {
         echo "default";
+    }
+);
+
+$app->get(
+    '/login',
+    function () use ($app) {
+        if (isset($_COOKIE['login']) && $_COOKIE['login'] == true) {
+            $app->response->setStatus(200);
+        } else {
+            $app->response->setStatus(401);
+        }
+    }
+);
+
+$app->post(
+    '/login',
+    function () use ($app) {
+        /* DUMMY LOGIN DATA */
+        include('users.php');
+        
+        if (isset($_POST['username'])) $username = $_POST['username']; 
+        if (isset($_POST['password'])) $password = $_POST['password']; 
+        $success = false;
+        foreach ( $users as $user ) {
+            if  ($user['username'] == $username && $user['password'] == $password ) {
+                $success = true;
+            }
+        }
+        if ($success) {
+            setcookie('login',true, time() + 3600);
+            $app->response->setStatus(200);
+            $app->redirect("../web/index.html");
+        } else {
+            $app->response->setStatus(401);
+        }
+    }
+);
+
+$app->get(
+    '/logout',
+    function () use ($app) {
+        setcookie ("login", "", time() - 3600);
+        $app->response->setStatus(200);
+        $app->redirect("../web/index.html");
     }
 );
 

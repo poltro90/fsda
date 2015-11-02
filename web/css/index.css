@@ -1,0 +1,9 @@
+body {
+    background-color: #222d32;
+}
+
+#login {
+    margin: auto;
+    margin-top: 20px;
+    width: 400px;
+}

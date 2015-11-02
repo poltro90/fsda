@@ -29,6 +29,8 @@
     <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker-bs3.css">
     <!-- bootstrap wysihtml5 - text editor -->
     <link rel="stylesheet" href="plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/index.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -38,7 +40,7 @@
     <![endif]-->
   </head>
     <body class="hold-transition skin-blue sidebar-mini">
-        <div class="wrapper">
+        <div class="wrapper" id="main-wrapper">
             <header class="main-header" id="header"></header>
             <aside class="main-sidebar" id="sidebar"></aside>
             <div class="content-wrapper" id="main"></div>
@@ -88,10 +90,21 @@
         <script src="plugins/flot/jquery.flot.js"></script>
         
         <script type="text/javascript">
-            $("#header").load('components/header/header.html');
-            $("#sidebar").load('components/sidebar/sidebar.html');
-            $("#main").load('components/main/main.html');
-            $("#footer").load('components/footer/footer.html');
+            $.ajax({
+                url: "../rest/login",
+                statusCode: {
+                    200: function() {
+                        $("#header").load('components/header/header.html');
+                        $("#sidebar").load('components/sidebar/sidebar.html');
+                        $("#main").load('components/main/main.html');
+                        $("#footer").load('components/footer/footer.html');
+                    },
+                    401: function() {
+                        $("#main-wrapper").load('components/login/login.html');
+                    }
+                }
+            });
+            
         </script>
     </body>
 </html>
