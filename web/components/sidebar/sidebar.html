@@ -1,5 +1,20 @@
 <section class="sidebar" id="sidebar-content">
 </section>
 <script type="text/javascript">
-    $("#sidebar-content").load('components/sidebar/admin-sidebar.html');
+    var user = $.parseJSON(Cookies.get('user'));
+    switch ( user.type ) {
+        case 'user':
+            $("#sidebar-content").load('components/sidebar/user-sidebar.html'); 
+            break;
+        case 'support':
+            $("#sidebar-content").load('components/sidebar/support-sidebar.html');
+            break;
+        case 'doctor':
+            $("#sidebar-content").load('components/sidebar/doctor-sidebar.html');
+            break;
+        case 'admin':
+            $("#sidebar-content").load('components/sidebar/admin-sidebar.html');
+            break;        
+    } 
+    
 </script>

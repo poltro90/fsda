@@ -41,11 +41,12 @@ $app->post(
         }
         if ($success) {
             setcookie('login',true, time() + 3600);
+            setcookie('username',$username, time() + 3600);
             $app->response->setStatus(200);
-            $app->redirect("../web/index.html");
         } else {
             $app->response->setStatus(401);
         }
+        $app->redirect("../web/index.html");
     }
 );
 
@@ -53,34 +54,9 @@ $app->get(
     '/logout',
     function () use ($app) {
         setcookie ("login", "", time() - 3600);
+        setcookie('username',$username, time() - 3600);
         $app->response->setStatus(200);
         $app->redirect("../web/index.html");
-    }
-);
-
-// Routes for each user type
-$app->get(
-    '/home/user',
-    function () {
-        echo "home/user";
-    }
-);
-$app->get(
-    '/home/doctor',
-    function () {
-        echo "home/doctor";
-    }
-);
-$app->get(
-    '/home/support',
-    function () {
-        echo "home/support";
-    }
-);
-$app->get(
-    '/home/admin',
-    function () {
-        echo "home/admin";
     }
 );
 
@@ -90,7 +66,7 @@ $app->group('/api', function () use ($app) {
     $app->response->headers->set('Content-Type', 'application/json');
     // User routes
     $app->get(
-        '/user/:id',
+        '/user/id/:id',
         function ($id) {
             echo "user/$id";
         }
@@ -98,7 +74,26 @@ $app->group('/api', function () use ($app) {
     $app->get(
         '/user/list',
         function () {
-            echo "user/list";
+            /* DUMMY USER DATA */
+            include('users.php');
+            echo json_encode($users,JSON_PRETTY_PRINT);
+        }
+    );
+    $app->get(
+        '/user/whoami',
+        function () {
+            if (isset($_COOKIE['login']) && $_COOKIE['login'] == true) {
+                /* DUMMY USER DATA */
+                include('users.php');
+                foreach ( $users as $key => $user ) {
+                    if  ($user['username'] == $_COOKIE['username'] ) {
+                        break;
+                    }
+                }
+                echo json_encode($users[$key],JSON_PRETTY_PRINT);
+            } else {
+                $app->response->setStatus(401);
+            }
         }
     );
     

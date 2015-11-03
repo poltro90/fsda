@@ -88,16 +88,23 @@
         <script src="plugins/chartjs/Chart.js"></script>
         <!-- Flot.js -->
         <script src="plugins/flot/jquery.flot.js"></script>
+        <!-- js-cookie -->
+        <script src="plugins/js-cookie/js.cookie.js"></script>
         
         <script type="text/javascript">
             $.ajax({
                 url: "../rest/login",
                 statusCode: {
                     200: function() {
-                        $("#header").load('components/header/header.html');
-                        $("#sidebar").load('components/sidebar/sidebar.html');
-                        $("#main").load('components/main/main.html');
-                        $("#footer").load('components/footer/footer.html');
+                        // Get current user information
+                        $.getJSON( "../rest/api/user/whoami", function( user ) {
+                            Cookies.set('user',user);
+                            console.log(Cookies.get('user'));
+                            $("#header").load('components/header/header.html');
+                            $("#sidebar").load('components/sidebar/sidebar.html');
+                            $("#main").load('components/main/main.html');
+                            $("#footer").load('components/footer/footer.html');
+                        });
                     },
                     401: function() {
                         $("#main-wrapper").load('components/login/login.html');
