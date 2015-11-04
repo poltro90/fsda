@@ -1,0 +1,40 @@
+<!--
+HEART RATE PLOT
+Request the heart rate data and build the plot based on the received data.
+Filter results based on time
+-->
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">Heart Rate Plot</h3>
+        <div class="pull-right">
+            <select name="time-filter" class="form-control select2 select2-hidden-accessible" id="hr-time-selector">
+                <option value="60">1 minute</option>
+                <option value="300">5 minutes</option>
+                <option value="600">10 minutes</option>
+                <option value="1800">30 minutes</option>
+                <option value="3600" selected>1 hour</option>
+            </select>
+        </div>
+    </div>
+    <div class="box-body">
+        <div id="hr-plot-canvas" style="width:100%;height:300px"></div>
+    </div><!-- /.box-body -->
+    <!-- Loading (remove the following to stop the loading) -->
+    <div class="overlay" id="hr-plot-overlay">
+        <i class="fa fa-refresh fa-spin"></i>
+    </div>
+    <!-- end loading -->
+</div><!-- /.box -->
+
+<script type="text/javascript">
+    function load_hr_plot(time) {
+        $.getJSON( "../rest/api/data/hr/test/" + time, function( response ) {
+            console.log(response);
+            $.plot($("#hr-plot-canvas"), [ response.data ]);
+        }).done($('#hr-plot-overlay').hide());
+    }
+    $("#hr-time-selector").change(function(){
+        load_hr_plot($("#hr-time-selector").val());
+    });
+    load_hr_plot(3600);
+</script>
