@@ -122,6 +122,39 @@ $app->group('/api', function () use ($app) {
             }
         );
         $app->get(
+            '/hr/:user/:results/avg',
+            function ($user, $results) {
+                $response = csvDecode('hr',$results);
+                $sum=0;
+                foreach ($response['data'] as $data) {
+                    $sum += $data[1];
+                }
+                $return['avg'] = intval($sum / $response['results']);
+                $return['results'] = $response['results'];
+                echo json_encode($return,JSON_PRETTY_PRINT);
+            }
+        );
+        $app->get(
+            '/hr/:user/:results/minmax',
+            function ($user, $results) {
+                $response = csvDecode('hr',$results);
+                $max=0;
+                $min=null;
+                foreach ($response['data'] as $data) {
+                    if ($max < $data[1]) {
+                        $max = $data[1];
+                    }
+                    if ( is_null($min) || $min > $data[1] ) {
+                        $min = $data[1];
+                    }
+                }
+                $return['max'] = $max;
+                $return['min'] = $min;
+                $return['results'] = $response['results'];
+                echo json_encode($return,JSON_PRETTY_PRINT);
+            }
+        );
+        $app->get(
             '/tags/:user/:results',
             function ($user, $results) {
                 $response = csvDecode('tags',$results);
@@ -133,6 +166,38 @@ $app->group('/api', function () use ($app) {
             function ($user, $results) {
                 $response = csvDecode('temp',$results);
                 echo json_encode($response,JSON_PRETTY_PRINT);
+            }
+        );
+        $app->get(
+            '/temp/:user/:results/avg',
+            function ($user, $results) {
+                $response = csvDecode('temp',$results);
+                $sum=0;
+                foreach ($response['data'] as $data) {
+                    $sum += $data[1];
+                }
+                $return['avg'] = intval($sum / $response['results']);
+                $return['results'] = $response['results'];
+                echo json_encode($return,JSON_PRETTY_PRINT);
+            }
+        );
+        $app->get(
+            '/temp/:user/:results/minmax',
+            function ($user, $results) {
+                $response = csvDecode('temp',$results);
+                $max=0;
+                foreach ($response['data'] as $data) {
+                    if ( $max < $data[1] ) {
+                        $max = $data[1];
+                    }
+                    if ( is_null($min) || $min > $data[1] ) {
+                        $min = $data[1];
+                    }
+                }
+                $return['max'] = $max;
+                $return['min'] = $min;
+                $return['results'] = $response['results'];
+                echo json_encode($return,JSON_PRETTY_PRINT);
             }
         );
     });

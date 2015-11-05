@@ -1,18 +1,120 @@
 <section class="content">
     <div class="row">
-        <div class="col-md-12" id="hr-plot"></div> 
-    </div>
-    <div class="row">
-        <div class="col-md-6" id="electro-plot"></div>
-        <div class="col-md-6" id="move-plot"></div>
+        <div class="col-md-6" id="heart-avg">
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h1>
+                        <i class="fa fa-heartbeat text-red"></i>
+                        <span id="heart-avg-val"></span>
+                    </h1>
+                    <div>
+                        <label>Your heart rate in the last 
+                            <select name="time-filter" class="form-control select2 select2-hidden-accessible" id="hr-time-selector">
+                                <option value="60">1 minute</option>
+                                <option value="300">5 minutes</option>
+                                <option value="600">10 minutes</option>
+                                <option value="1800">30 minutes</option>
+                                <option value="3600">1 hour</option>
+                                <option value="7200" selected>2 hours</option>
+                            </select>
+                        </label>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="col-md-6" id="heart-max">
+                        <div class="description-block">
+                            <span class="description-percentage text-red"><i class="fa fa-caret-up" id="heart-max-val"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6" id="heart-min">
+                        <div class="description-block">
+                            <span class="description-percentage text-green"><i class="fa fa-caret-down" id="heart-min-val"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" id="heart-avg">
+            <div class="box box-default">
+                <div class="box-header with-border">
+                    <h1>
+                        <i class="fa fa-fire text-yellow"></i>
+                        <span><span id="temp-avg-val"></span> °C</span>
+                    </h1>
+                    <div>
+                        <label>Your temperature in the last 
+                            <select name="time-filter" class="form-control select2 select2-hidden-accessible" id="temp-time-selector">
+                                <option value="60">1 minute</option>
+                                <option value="300">5 minutes</option>
+                                <option value="600">10 minutes</option>
+                                <option value="1800">30 minutes</option>
+                                <option value="3600">1 hour</option>
+                                <option value="7200" selected>2 hours</option>
+                            </select>
+                        </label>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="col-md-6" id="temp-max">
+                        <div class="description-block">
+                            <span class="description-percentage text-red"><i class="fa fa-caret-up" id="temp-max-val"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6" id="heart-min">
+                        <div class="description-block">
+                            <span class="description-percentage text-green"><i class="fa fa-caret-down" id="temp-min-val"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div> 
     <div class="row">
         <div class="col-md-12" id="temp-plot"></div> 
     </div>
 </section>
 <script type="text/javascript">
-    $("#hr-plot").load('components/plot/hr.html');
-    $("#electro-plot").load('components/plot/electro.html');
-    $("#move-plot").load('components/plot/move.html');
-    $("#temp-plot").load('components/plot/temp.html');
+    // Heart-rate AVG
+    function load_hr_avg(time) {
+        $.getJSON( "../rest/api/data/hr/test/" + time + "/avg", function( response ) {
+            $("#heart-avg-val").html(response.avg);
+        });
+    }
+    $("#hr-time-selector").change(function(){
+        load_hr_avg($("#hr-time-selector").val());
+        load_hr_minmax($("#hr-time-selector").val());
+    });
+    load_hr_avg(7200);
+    
+    // Heart-rate MAX
+    function load_hr_minmax(time) {
+        $.getJSON( "../rest/api/data/hr/test/" + time + "/minmax", function( response ) {
+            $("#heart-max-val").html(response.max);
+            $("#heart-min-val").html(response.min);
+        });
+    }
+    load_hr_minmax(7200);
+    
+    // Temperature AVG
+    function load_temp_avg(time) {
+        $.getJSON( "../rest/api/data/temp/test/" + time + "/avg", function( response ) {
+            $("#temp-avg-val").html(response.avg);
+        });
+    }
+    $("#temp-time-selector").change(function(){
+        load_temp_avg($("#temp-time-selector").val());
+        load_temp_minmax($("#temp-time-selector").val());
+    });
+    load_temp_avg(7200);
+    
+    // Temperature MAX
+    function load_temp_minmax(time) {
+        $.getJSON( "../rest/api/data/temp/test/" + time + "/minmax", function( response ) {
+            $("#temp-max-val").html(response.max);
+            $("#temp-min-val").html(response.min);
+        });
+    }
+    load_temp_minmax(7200);
 </script>

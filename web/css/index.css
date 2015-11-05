@@ -7,3 +7,24 @@ body {
     margin-top: 20px;
     width: 400px;
 }
+#heart-avg {
+    text-align: center;
+}
+#heart-avg i,
+#heart-avg-val,
+#temp-avg-val {
+    font-size: 200px;
+}
+#heart-avg-val,
+#temp-avg-val {
+    margin-left: 20px;
+    font-weight: bold;
+}
+
+#heart-max i,
+#heart-min i,
+#temp-max i,
+#temp-min i{
+    font-size: 60px;
+}
+

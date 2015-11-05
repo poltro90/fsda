@@ -1,0 +1,18 @@
+<section class="content">
+    <div class="row">
+        <div class="col-md-12" id="hr-plot"></div> 
+    </div>
+    <div class="row">
+        <div class="col-md-6" id="electro-plot"></div>
+        <div class="col-md-6" id="move-plot"></div>
+    </div> 
+    <div class="row">
+        <div class="col-md-12" id="temp-plot"></div> 
+    </div>
+</section>
+<script type="text/javascript">
+    $("#hr-plot").load('components/plot/hr.html');
+    $("#electro-plot").load('components/plot/electro.html');
+    $("#move-plot").load('components/plot/move.html');
+    $("#temp-plot").load('components/plot/temp.html');
+</script>
