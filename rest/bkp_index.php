@@ -3,9 +3,6 @@ session_start();
 require 'Slim/Slim.php';
 \Slim\Slim::registerAutoloader();
 
-require_once('vendor/autoload.php');
-use \Firebase\JWT\JWT;
-
 $app = new \Slim\Slim();
 $api = "https://test-embrace-api.empatica.com/v1";
 
@@ -40,38 +37,36 @@ $app->post(
         if (isset($_POST['password'])) $password = $_POST['password']; 
         $success = false;
         
-        $userData = null;
-        foreach ($users as $key => $user) {
-            if ( $user['username'] == $_POST['username'] && $user['password'] == $_POST['password'] ) {
-                $success = true;
-                $userData = $user;
-                break;
-            }
-        }
+        $data['email'] = $_POST['username'];
+        $data['password'] = $_POST['password'];
+        $json = json_encode($data);
         
-        if ($success) {
-            $key = "example_key";
-            $token = array(
-                "iss" => "http://example.org",
-                "aud" => "http://example.com",
-                "iat" => time(),
-                "nbf" => time(),
-                "PAYLOAD" => array (
-                    'userId' => $userData['id'],
-                    'username' => $userData['username'],
-                    'birthdate' => $userData['birthdate'],
-                    'sex' => $userData['sex']
-                )
-            );
-
-            $jwt = JWT::encode($token, $key);
-            print_r($jwt);
+        print_r($json);
+        
+        $ch = curl_init(); 
+        curl_setopt($ch, CURLOPT_URL, $login_url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        
+        $success = json_decode(curl_exec($ch), true);
+        
+        print_r($success);
+        
+        if ( $success['status'] == "error" ) {
+            $app->response->setStatus(401);
+        } else if ( $success['status'] == "ok" ) {
+            setcookie('login',true, time() + 3600);
+            setcookie('username',$username, time() + 3600);
+            setcookie('token', $success['payload']['token'], time() + 3600);
             $app->response->setStatus(200);
         } else {
-            echo '{"status":"error", "message":"Invalid username or password"}';
-            $app->response->setStatus(401);
+            $app->response->setStatus(500);
         }
-
+        
+        curl_close($ch);
         //$app->redirect("../web/index.html");
     }
 );

@@ -1,0 +1,86 @@
+TOKEN
+
+auth: Bearer KEY
+
+
+https://test-embrace-api.empatica.com/v1/users
+
+\
+# Login
+POST `https://test-embrace-api.empatica.com/v1/login`
+
+with JSON  `{ "email" : "anEmail",    "password" : "aPassword" }`
+
+## API Response:
+
+```
+{
+  "status": "ok",
+  "statusText": "",
+  "payload": {
+    "user": {
+      "id": 10073,
+      "birthday": null,
+      "email": "marco@empatica.com",
+      "emailVerified": false,
+      "firstName": "Marco",
+      "lastName": "Bassi",
+      "gender": "",
+      "importedFrom": "workable",
+      "createdAt": "2015-12-10T07:40:15Z",
+      "embraceUsageSurveyCompleted": true,
+      "userAccount": {
+        "userId": 2,
+        "createdAt": "2015-12-08T10:49:51Z",
+        "updatedAt": "2015-12-08T10:49:51Z",
+        "deletedAt": null
+      },
+      "phones": [],
+      "orders": [],
+      "caregivers": [],
+      "registeredWithInviteCode": null,
+      "inviteCodes": []
+    },
+    "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJQQVlMT0FEIjp7InVzZXJJZCI6MTAwNzMsInJvbGVzIjpbXSwiYWNjb3VudENyZWF0aW9uUmVxdWVzdElkIjoiIn0sImV4cCI6MTQ0OTgxOTY4MiwiaWF0IjoxNDQ5NzMzMjgyLCJpc3MiOiJhbGVjaGEifQ.QmwALqUbRpqGA9YKZEqMrkU4i7jI4kzZsbS_KNmcKDNamcQN8ROPtjYpWnrkrOlT1GcLAmDvpSsXn3ZXTjjp88sEJd6GUKm1YSoBMva0CZLXhRZ2-vh9qCpUnMMjAxf4zOrsQu93nCgmCgk8pkLKpNhswtvLxIu_6Ide6K10XzJ6RJZWhNWLFmN9Fr_Btd2XRKAaYlXO4Aw-0Y4LTNu6esbm-kqRvEu3ORk2zKBXbl3eV-0bEIfJHOyQwsPe7wbELnRSmnL1gCdh3rKwLBWYFqdQxAmFRoGP-LS2NlQFqn3oVgsjgu9bSmz1Kt6Eq4rEylBoagUJyk-B0ZqCsCvFTA"
+  }
+}
+```
+
+The token has the following format (you can discover more about JWT [here](http://jwt.io/introduction/))
+```
+{
+  "PAYLOAD": {
+    "userId": 10073,
+    "roles": [],
+  },
+  "exp": 1449818885,
+  "iat": 1449732485,
+  "iss": "alecha"
+}
+```
+
+For roles management, you can put all the roles the user belongs to in the `roles` array as strings.
+
+
+
+
+
+
+//    $("#login-submit").click(function() {
+//        var login_url = "https://test-embrace-api.empatica.com/v1/login";
+//        var email = $("#email").val();
+//        var password = $("#password").val();
+//        var login_data = '{ "email" : "' + email + '", "password" : "' + password + '" }';
+//        $.ajax({
+//            url: login_url,
+//            method: "POST",
+//            data: login_data
+//        }).done( function(response) {
+//            console.log(response);
+//        });
+//    });
+    
+//    $.getJSON( "../rest/api/data/hr/test/2000", function( response ) {
+//        console.log(response);
+//        $.plot($("#hr-plot"), [ response.data ]);
+//    }).done($('#hr-plot-overlay').hide());
