@@ -6,6 +6,7 @@ require 'Slim/Slim.php';
 require_once('vendor/autoload.php');
 use \Firebase\JWT\JWT;
 
+
 $app = new \Slim\Slim();
 $api = "https://test-embrace-api.empatica.com/v1";
 
@@ -22,9 +23,22 @@ $app->get(
 $app->get(
     '/login',
     function () use ($app) {
-        if (isset($_COOKIE['login']) && $_COOKIE['login'] == true) {
-            $app->response->setStatus(200);
+        if (isset($_COOKIE['token'])) {
+            
+            $dec = JWT::decode($_COOKIE['token'], 'example_key', array('HS256'));
+            if (is_object($dec)) {
+                echo '{"status":"ok", "message":""}';
+                $app->response->setStatus(200);
+            } else {
+                setcookie('user','', time() - 3600);
+                setcookie('token', '', time() - 3600);
+                echo '{"status":"error", "message":"Invalid token"}';
+                $app->response->setStatus(401);
+            }
         } else {
+            setcookie('user','', time() - 3600);
+            setcookie('token', '', time() - 3600);
+            echo '{"status":"error", "message":"Invalid token"}';
             $app->response->setStatus(401);
         }
     }
@@ -51,37 +65,51 @@ $app->post(
         
         if ($success) {
             $key = "example_key";
+            $payload = array (
+                'user' => array (
+                    'userId' => $userData['id'],
+                    'username' => $userData['username'],
+                    'birthdate' => $userData['birthdate'],
+                    'sex' => $userData['sex'],
+                    'type' => $userData['type'],
+                    'name' => $userData['name'],
+                    'surname' => $userData['surname']
+                ),
+            );
             $token = array(
                 "iss" => "http://example.org",
                 "aud" => "http://example.com",
                 "iat" => time(),
                 "nbf" => time(),
-                "PAYLOAD" => array (
-                    'userId' => $userData['id'],
-                    'username' => $userData['username'],
-                    'birthdate' => $userData['birthdate'],
-                    'sex' => $userData['sex']
-                )
+                "PAYLOAD" => $payload
             );
 
             $jwt = JWT::encode($token, $key);
-            print_r($jwt);
+            $response = array(
+                'status' => 'ok',
+                'statusText' => '',
+                'PAYLOAD' => $payload,
+                'token' => $jwt
+            );
+            setcookie('token', $jwt, time() + 3600);
+            setcookie('user', json_encode($payload['user']), time() + 3600);
+            echo json_encode($response);
             $app->response->setStatus(200);
         } else {
             echo '{"status":"error", "message":"Invalid username or password"}';
             $app->response->setStatus(401);
         }
 
-        //$app->redirect("../web/index.html");
+        $app->redirect("../web/index.html");
     }
 );
 
 $app->get(
     '/logout',
     function () use ($app) {
-        setcookie ("login", "", time() - 3600);
-        setcookie('username',$username, time() - 3600);
-        setcookie('token', "", time() - 3600);
+//        setcookie ("login", "", time() - 3600);
+        setcookie('user','', time() - 3600);
+        setcookie('token', '', time() - 3600);
         $app->response->setStatus(200);
         $app->redirect("../web/index.html");
     }
@@ -96,17 +124,36 @@ $app->group('/api', function () use ($app, $api) {
     $app->get(
         '/user/id/:id',
         function ($id) use ($app, $api) {
-            $user_url = "{$api}/users/{$id}";
-            //$auth = "Authorization: {$_COOKIE['token']}";
-            print_r($_COOKIE);
-            $auth = "Authorization: Bearer {$_COOKIE['token']}";
-            $ch = curl_init(); 
-            curl_setopt($ch, CURLOPT_URL, $user_url);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array($auth));
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-        
-            $success = json_decode(curl_exec($ch), true);
-            print_r($success);
+            $key = "example_key";
+            $jwt = JWT::decode($_COOKIE['token'], $key, array('HS256'));
+            if (is_object($jwt)) {
+                $userData = null;
+                foreach ( $users as $user) {
+                    if ($user['id'] == $id) {
+                        $userData = array (
+                            'userId' => $user['id'],
+                            'username' => $user['username'],
+                            'birthdate' => $user['birthdate'],
+                            'sex' => $user['sex'],
+                            'type' => $user['type'],
+                            'name' => $user['name'],
+                            'surname' => $user['surname']
+                        );
+                        break;
+                    }
+                }
+                if (empty($userData)) {
+                    $app->response->setStatus(201);
+                } else {
+                    echo json_encode($userData);
+                    $app->response->setStatus(200);
+                }
+            } else {
+                setcookie('user', '', time() - 3600);
+                setcookie('token', "", time() - 3600);
+                $app->response->setStatus(401);
+                $app->redirect("../web/index.html");
+            }
         }
     );
     
@@ -123,18 +170,39 @@ $app->group('/api', function () use ($app, $api) {
     );
     $app->get(
         '/user/whoami',
-        function () {
-            if (isset($_COOKIE['login']) && $_COOKIE['login'] == true) {
-                /* DUMMY USER DATA */
-                include('users.php');
-                foreach ( $users as $key => $user ) {
-                    if  ($user['username'] == $_COOKIE['username'] ) {
+        function () use ($app) {
+            include('users.php');
+            $key = "example_key";
+            $jwt = JWT::decode($_COOKIE['token'], $key, array('HS256'));
+            if (is_object($jwt)) {
+                $userData = null;
+                foreach ( $users as $user) {
+                    $userInfo = json_decode($_COOKIE['user'], true);
+                    $id = $userInfo['userId'];
+                    if ($user['id'] == $id) {
+                        $userData = array (
+                            'userId' => $user['id'],
+                            'username' => $user['username'],
+                            'birthdate' => $user['birthdate'],
+                            'sex' => $user['sex'],
+                            'type' => $user['type'],
+                            'name' => $user['name'],
+                            'surname' => $user['surname']
+                        );
                         break;
                     }
                 }
-                echo json_encode($users[$key],JSON_PRETTY_PRINT);
+                if (empty($userData)) {
+                    $app->response->setStatus(201);
+                } else {
+                    echo json_encode($userData);
+                    $app->response->setStatus(200);
+                }
             } else {
+                setcookie('token', '', time() - 3600);
+                setcookie('token', "", time() - 3600);
                 $app->response->setStatus(401);
+                $app->redirect("../web/index.html");
             }
         }
     );

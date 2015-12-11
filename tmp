@@ -3,7 +3,7 @@ TOKEN
 auth: Bearer KEY
 
 
-https://test-embrace-api.empatica.com/v1/users
+https://test-embrace-api.empatica.com/v1/users/1234567
 
 \
 # Login
